@@ -4,13 +4,12 @@ const Promise = require('bluebird');
 const eachLine = Promise.promisify(lineReader.eachLine);
 
 let filename = process.argv.slice(2)[0] || 'input.txt';
-let crab = [];
+let total = 0;
 
 eachLine(filename, function(line) {
-  crab = line.split(',').map(e=>Number(e.trim()));
+  let output = line.split(" | ")[1];
+  let count = output.split(" ").map(e=>e.length);
+  total += count.filter(e=>e===2||e===4||e===3||e===7).length;
 }).then(function(err) {
-  crab = crab.sort((a,b)=>(a-b));
-  let median = crab[Math.ceil(crab.length/2)-1];
-  let total = crab.map(e=>Math.abs(median-e)).reduce((a,b)=>(a+b));
   console.log(total);
 });
