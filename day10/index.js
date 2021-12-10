@@ -4,23 +4,53 @@ const Promise = require('bluebird');
 const eachLine = Promise.promisify(lineReader.eachLine);
 
 let filename = process.argv.slice(2)[0] || 'input.txt';
-let caves = [];
-let risks = 0;
+let errors = [];
+let count = 0;
+
+function value(close) {
+  switch(close) {
+    case ']': return 57;
+    case ')': return 3;
+    case '}': return 1197;
+    case '>': return 25137;
+  }
+  console.log("Error");
+  return 0;
+}
+function unexpected(inp,exp) {
+  let ret = true;
+  if((inp === ")" && exp === "(") || (inp === ">" && exp === "<") 
+      || (inp === "]" && exp === "[") || (inp === "}" && exp === "{")) {
+    ret = false;
+  }
+  return ret;
+}
 
 eachLine(filename, function(line) {
-  caves.push([...line].map(e=>Number(e)));
-}).then(function(err) {
-  let w = caves[0].length;
-  let h = caves.length;
-
-  for(let i=0;i<w;i++) {
-    for(let j=0;j<h;j++) {
-      let t = caves[j][i];
-      if( (j===0||t<caves[j-1][i]) && (j===(h-1)||t<caves[j+1][i]) 
-        && (i===0||t<caves[j][i-1]) && (i===(w-1)||t<caves[j][i+1]) ) {
-        risks += t+1;
-      }
+  let input = [...line];
+  let stack = [];
+  let done = false;
+  for(let i=0;i<input.length&&!done;i++) {
+    let expected = "";
+    switch(input[i]) {
+      case '[':
+      case '{':
+      case '<':
+      case '(':
+        stack.push(input[i]);
+        break;
+      case ']':
+      case '}':
+      case '>':
+      case ')':
+        let expected = stack.pop();
+        if(unexpected(input[i],expected)) {
+          errors.push(input[i]);
+          count += value(input[i]);
+          done=true;
+        }
     }
   }
-  console.log(risks);
+}).then(function(err) {
+  console.log(count);
 });
