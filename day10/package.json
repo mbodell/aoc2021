@@ -1,7 +1,7 @@
 {
-  "name": "day9",
+  "name": "day10",
   "version": "1.0.0",
-  "description": "Day 9 of Advent of Code 2021",
+  "description": "Day 10 of Advent of Code 2021",
   "main": "index.js",
   "repository": {
     "type": "git",
