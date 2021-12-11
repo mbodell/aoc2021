@@ -4,53 +4,54 @@ const Promise = require('bluebird');
 const eachLine = Promise.promisify(lineReader.eachLine);
 
 let filename = process.argv.slice(2)[0] || 'input.txt';
-let errors = [];
-let count = 0;
-
-function value(close) {
-  switch(close) {
-    case ']': return 57;
-    case ')': return 3;
-    case '}': return 1197;
-    case '>': return 25137;
-  }
-  console.log("Error");
-  return 0;
-}
-function unexpected(inp,exp) {
-  let ret = true;
-  if((inp === ")" && exp === "(") || (inp === ">" && exp === "<") 
-      || (inp === "]" && exp === "[") || (inp === "}" && exp === "{")) {
-    ret = false;
-  }
-  return ret;
-}
+let cave = [];
+let flashes = 0;
+let steps = process.argv.slice(3)[0] || 100;
 
 eachLine(filename, function(line) {
-  let input = [...line];
-  let stack = [];
-  let done = false;
-  for(let i=0;i<input.length&&!done;i++) {
-    let expected = "";
-    switch(input[i]) {
-      case '[':
-      case '{':
-      case '<':
-      case '(':
-        stack.push(input[i]);
-        break;
-      case ']':
-      case '}':
-      case '>':
-      case ')':
-        let expected = stack.pop();
-        if(unexpected(input[i],expected)) {
-          errors.push(input[i]);
-          count += value(input[i]);
-          done=true;
-        }
-    }
-  }
+  cave.push([...line].map(e=>Number(e)));
 }).then(function(err) {
-  console.log(count);
+  for(let i=0;i<steps;i++) {
+    // First, the energy level of each octopus increases by 1.
+    cave = cave.map(e=>e.map(f=>f+1));
+    let fl = 1;
+    while(fl!==0) {
+      fl = cave.map(e=>e.filter(f=>f>9&&f<100).length).reduce((a,b)=>a+b);
+      cave = cave.map(e=>e.map(f=>(f>9&&f<100)?f+100:f));
+      for(let j=0;j<cave.length;j++) {
+        for(let k=0;k<cave[j].length;k++) {
+          if(cave[j][k]>=100&&cave[j][k]<200) {
+            if(k>0) {
+              if(j>0) {
+                cave[j-1][k-1]++;
+              }
+              cave[j][k-1]++;
+              if(j+1<cave.length) {
+                cave[j+1][k-1]++;
+              }
+            }
+            if(k+1<cave[j].length) {
+              if(j>0) {
+                cave[j-1][k+1]++;
+              }
+              cave[j][k+1]++;
+              if(j+1<cave.length) {
+                cave[j+1][k+1]++;
+              }
+            }
+            if(j>0) {
+              cave[j-1][k]++;
+            }
+            if(j+1<cave[j].length) {
+              cave[j+1][k]++;
+            }
+            cave[j][k] += 100;
+          }
+        }
+      }
+    }
+    flashes += cave.map(e=>e.filter(f=>f>100).length).reduce((a,b)=>a+b);
+    cave = cave.map(e=>e.map(f=>(f>100)?0:f));
+  }
+  console.log(flashes);
 });
