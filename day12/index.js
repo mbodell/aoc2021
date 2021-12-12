@@ -15,8 +15,9 @@ eachLine(filename, function(line) {
   if( cx[nodes[1]] === undefined ) {
     cx[nodes[1]] = [];
   }
-  cx[nodes[0]].push(cx[nodes[1]]);
-  cx[nodes[1]].push(cx[nodes[0]]);
+  cx[nodes[0]].push(nodes[1]);
+  cx[nodes[1]].push(nodes[0]);
 }).then(function(err) {
   console.log(cx);
+  console.log(cx["start"]);
 });
