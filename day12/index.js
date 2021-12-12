@@ -7,6 +7,12 @@ let filename = process.argv.slice(2)[0] || 'input.txt';
 let bfsPath = [];
 let paths = [];
 let cx = {};
+
+function is_little(node) {
+  let lowerNode = node.toLowerCase();
+  return node === lowerNode;
+}
+
 eachLine(filename, function(line) {
   let nodes = line.split("-");
   if( cx[nodes[0]] === undefined ) {
@@ -18,6 +24,28 @@ eachLine(filename, function(line) {
   cx[nodes[0]].push(nodes[1]);
   cx[nodes[1]].push(nodes[0]);
 }).then(function(err) {
-  console.log(cx);
-  console.log(cx["start"]);
+  bfsPath.push(["start"]);
+  while(bfsPath.length > 0) {
+    let bfsNextPath = [];
+    while(bfsPath.length > 0) {
+      let path = bfsPath.pop();
+      let node = path[path.length-1];
+      if(node === "end") {
+        paths.push(path);
+      } else {
+        for(let i=0;i<cx[node].length;i++) {
+          let nextNode = cx[node][i];
+          if(is_little(nextNode) && path.findIndex(e=>e===nextNode)!==-1) {
+            // skip
+          } else {
+            let nextPath = [...path];
+            nextPath.push(nextNode);
+            bfsNextPath.push(nextPath);
+          }
+        }
+      }
+    }
+    bfsPath = bfsNextPath;
+  }
+  console.log(paths.length);
 });
