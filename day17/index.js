@@ -4,85 +4,50 @@ const Promise = require('bluebird');
 const eachLine = Promise.promisify(lineReader.eachLine);
 
 let filename = process.argv.slice(2)[0] || 'input.txt';
-
-let bits = [];
-
-let vCount = 0;
-
-let packets = [];
-
-function readBits(ind, num) {
-  let ret = 0;
-  for(let i=0;i<num;i++) {
-    ret *=2;
-    ret += bits[ind+i];
-  }
-  return ret;
-}
-
-function parsePacket(ind) {
-  let version = readBits(ind, 3);
-  let origInd = ind;
-  vCount += version;
-  console.log(`Packet version ${version} and count is now ${vCount}`);
-  ind += 3;
-  let type = readBits(ind, 3);
-  console.log(`Package type ${type}`);
-  ind += 3;
-  if(type === 4) {
-    // It's a number
-    let num = 0;
-    for(num = readBits(ind+1,4);bits[ind]===1;ind+=5) {
-      num *= 16;
-      num += readBits(ind+6,4);
-    }
-    ind += 5;
-    console.log(`Literal is ${num}`);
-  } else {
-    // It's an operator
-    let len = bits[ind];
-    ind++;
-    console.log(`Length type ID is ${len}`);
-    if(len===0) {
-      // length in bits of the sub
-      let size = readBits(ind, 15);
-      console.log(`The bits to read are ${size}`);
-      ind += 15;
-      let processed = 0;
-      while(processed < size) {
-        let pSize = parsePacket(ind);
-        console.log(`Processed a package of ${pSize} size`);
-        ind += pSize;
-        processed += pSize;
-      }
-    } else {
-      // num of packets in the sub
-      let num = readBits(ind, 11);
-      console.log(`The packets in the sub are ${num}`);
-      ind += 11;
-      for(let i=0;i<num;i++) {
-        let pSize = parsePacket(ind);
-        console.log(`Processed a package of ${pSize} size`);
-        ind += pSize;
-      }
-    }
-  }
-  let totSize = ind - origInd;
-  console.log(`Started package at ${origInd} and finished at ${ind} for ${totSize}`);
-  return totSize;
-}
-
+let minX = 0;
+let maxX = 0;
+let minY = 0;
+let maxY = 0;
 eachLine(filename, function(line) {
-  let letters = line.split("");
-  for(let i=0;i<letters.length;i++) {
-    let digits = parseInt(letters[i],16).toString(2).split("").map(e=>Number(e));
-    for(let j=4-digits.length;j>0;j--) {
-      bits=bits.concat([0]);
-    }
-    bits = bits.concat(digits);
+  let it = line.match(/(-?\d+)\.\.(-?\d+)/g);
+  let x = it[0].split("..").map(e=>Number(e));
+  minX = x[0];
+  maxX = x[1];
+  if(minX>maxX) {
+    maxX = x[0];
+    minX = x[1];
   }
+  x = it[1].split("..").map(e=>Number(e));
+  minY = x[0];
+  maxY = x[1];
+  if(minY>maxY) {
+    minY = x[1];
+    maxY = x[0];
+  }
+  console.log(`From x=${minX} to ${maxX} and y=${minY} to ${maxY}`);
 }).then(function(err) {
-  console.log(bits);
-  parsePacket(0);
-  console.log(vCount);
+  // Assume the target area allows us to drop in
+  // missle stops motion at the sum of the first x motions
+  // And missle always crosses y=0 again, maxium y
+  // is when second y is after the x motion stopped and y takes us directly
+  // from 0 to bottom of our range
+  let x = 0;
+  let sum=0;
+  for(;sum<minX;x++) {
+    sum+=x;
+  }
+  x--;
+  if(sum>maxX) {
+    // there is no good drop dead value
+    console.log("need better algo");
+  }
+  let y = -minY-1;
+  console.log(`The right maximum is (${x},${y})`);
+  // y is at a maximum after y steps
+  // The general formula for the y value of a missle after s steps
+  // doesn't depend on x but is:
+  // step*(y-(step-1)/2) 
+  // and since the maximum happens at step===y:
+  let answer = y*(y-(y-1)/2);
+  console.log(`The maximum was ${answer}`);
 });
