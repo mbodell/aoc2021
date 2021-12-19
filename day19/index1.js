@@ -54,7 +54,6 @@ function manDist(x, y) {
 
 function tryMatchScanners(s1,s2) {
   let ret = false;
-  console.log(`Try to match ${s1} to ${s2}`);
 
   let posS2 = scannersT[s2];
   let posS1 = scanners[s1];
@@ -76,14 +75,12 @@ function tryMatchScanners(s1,s2) {
           }
         }
         if(matches >= 12) {
-          console.log(`For ${o} orientation, ${i} s2 beacon, ${j} s1 beacon, got ${matches} matches`);
-          sPos[s2] = [sPos[s1][0]-delta[0],sPos[s1][1]-delta[1],sPos[s1][2]-delta[2]];
+          sPos[s2] = [delta[0],delta[1],delta[2]];
           // do something with orientation
           scanners[s2] = posS2[o];
           scanners[s2] = scanners[s2].map(e=>[e[0]+delta[0],e[1]+delta[1],e[2]+delta[2]]);
           scanners[s2].map(e=>pPos.push(e));
           scanners[s2].map(e=>beacon.add(""+e[0]+","+e[1]+","+e[2]));
-          console.log(beacon.size);
           sOrie[s2] = o;
           return true;
         }
@@ -106,13 +103,11 @@ eachLine(filename, function(line) {
     }
   }
 }).then(function(err) {
-  console.log(scnt);
   // Place scanner 0 as the right location
   sPos[0] = [0,0,0];
   sOrie[0] = [[0,1,2],[1,1,1]];
   scanners[0].map(e=>pPos.push(e));
   scanners[0].map(e=>beacon.add(""+e[0]+","+e[1]+","+e[2]));
-  console.log(beacon.size);
 
   let scanToMatch = [];
   scanToMatch.push(0);
@@ -128,7 +123,6 @@ eachLine(filename, function(line) {
         let mat = tryMatchScanners(i,c);
         if(mat === true) {
           scanToMatch.push(c);
-          console.log(`Got match for ${c}`);
         }
       }
     }
@@ -136,7 +130,6 @@ eachLine(filename, function(line) {
 
   console.log(beacon.size);
 
-  console.log("Manhatten distance max:");
   let maxDist = -1;
   for(let i=0;i<sPos.length;i++) {
     for(let j=i+1;j<sPos.length;j++) {
