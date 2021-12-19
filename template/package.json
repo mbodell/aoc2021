@@ -1,0 +1,23 @@
+{
+  "name": "day",
+  "version": "1.0.0",
+  "description": "Day of Advent of Code 2021",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mbodell/aoc2021.git"
+  },
+  "keywords": [
+    "aoc"
+  ],
+  "author": "Michael Bodell",
+  "license": "ISC",
+  "dependencies": {
+    "bluebird": "^3.7.2",
+    "line-reader": "^0.4.0"
+  },
+  "bugs": {
+    "url": "https://github.com/mbodell/aoc2021/issues"
+  },
+  "homepage": "https://github.com/mbodell/aoc2021#readme"
+}
