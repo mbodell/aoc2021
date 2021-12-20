@@ -78,9 +78,4 @@ eachLine(filename, function(line) {
   answer = imgs[steps].map(e=>e.filter(f=>f==='1').length).reduce((a,b)=>a+b);
 
   console.log(answer);
-  for(let i=0;i<imgs.length;i++) {
-    console.log(`for i ${i} the infinity is ${imgs[i][0][0]}`);
-  }
-
-  console.log(imgs[steps][0].reduce((a,b)=>a+b));
 });
