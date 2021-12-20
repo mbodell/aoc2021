@@ -25,18 +25,18 @@ eachLine(filename, function(line) {
   }
 }).then(function(err) {
   let img = [];
-  for(let i=0;i<image.length+2*(steps+1)*(steps+1);i++) {
-    for(let j=0;j<image[0].length+2*(steps+1)*(steps+1);j++) {
+  for(let i=0;i<image.length+2*(steps+1);i++) {
+    for(let j=0;j<image[0].length+2*(steps+1);j++) {
       if(j===0) {
         img[i] = [];
       }
-      if((j<(steps+1)*(steps+1)) ||
-         (j>=(image[0].length+(steps+1)*(steps+1))) ||
-         (i<(steps+1)*(steps+1)) ||
-         (i>=(image.length+(steps+1)*(steps+1))) ) {
+      if((j<(steps+1)) ||
+         (j>=(image[0].length+(steps+1))) ||
+         (i<(steps+1)) ||
+         (i>=(image.length+(steps+1))) ) {
         img[i][j] = '0';
       } else {
-        img[i][j] = image[i-((steps+1)*(steps+1))][j-((steps+1)*(steps+1))];
+        img[i][j] = image[i-((steps+1))][j-((steps+1))];
       }
     }
   }
