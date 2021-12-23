@@ -69,7 +69,7 @@ function caveS(p) {
 function errorEst(p) {
   let e = 0;
   for(let i=0;i<11;i++) {
-    if(i!==2&&i!==4&&i!==6&&i!==8) {
+    if(hallp(i)) {
       e += (Math.abs(pos[p[i]]-i)+1)*cost[p[i]];
     } else {
       for(let j=0;j<4;j++) {
@@ -86,15 +86,38 @@ function hallp(i) {
   return ((i%2)===1||i===0||i==10);
 }
 
-function track(p,c) {
+function track(p,c,o,oc,oest) {
   let est = c;
   // A* it up with a best case estimate
   est += errorEst(p);
   if(energy[est] === undefined) {
     energy[est] = [];
   }
-  energy[est].push([p,c]);
-  console.log(`At path length cost ${c} estimate ${est} cave ${caveS(p)}`);
+  let add = true;
+  for(let i=0;i<energy[est].length&&add;i++) {
+    let en = energy[est][i];
+    add = false;
+    if(en[1]!==c) {
+      add = true;
+    }
+    for(let j=0;j<11&&!add;j++) {
+      if(hallp(j)) {
+        if(en[0][j]!==p[j]) {
+          add = true;
+        }
+      } else {
+        for(let k=0;k<4&&!add;k++) {
+          if(en[0][j][k]!==p[j][k]) {
+            add = true;
+          }
+        }
+      }
+    }
+  }
+  if(add) {
+    energy[est].push([p,c]);
+  }
+  console.log(`From orig est ${oest} path length ${oc} to path length cost ${c} estimate ${est} old ${caveS(o)} => cave ${caveS(p)}`);
 }
 
 function legalMove(p,i,j) {
@@ -187,7 +210,7 @@ function getVertD(p,i) {
   return ret;
 }
 
-function expand(p, c) {
+function expand(p, c, oest) {
   let copy = deepCopy(p);
 
   for(let i=0;i<11;i++) {
@@ -211,7 +234,7 @@ function expand(p, c) {
             copy[i] = '.';
           }
           let moveCost = (Math.abs(i-j)+verti+vertj)*cost[piece];
-          track(copy,c+moveCost);
+          track(copy,c+moveCost,p,c,oest);
         }
       }
     }
@@ -245,7 +268,7 @@ eachLine(filename, function(line) {
         if(solvep(path)) {
           answer=costE;
         } else {
-          expand(path,costE);
+          expand(path,costE,i);
         }
       }
     }
