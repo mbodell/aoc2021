@@ -63,22 +63,22 @@ function errorEst(p) {
         switch(p[i][j]) {
           case 'A':
             if(i!==2) {
-              e += (Math.abs(2-i)+4+j)*costA;
+              e += (Math.abs(2-i)+2+j)*costA;
             }
             break;
           case 'B':
             if(i!==4) {
-              e += (Math.abs(4-i)+4+j)*costB;
+              e += (Math.abs(4-i)+2+j)*costB;
             }
             break;
           case 'C':
             if(i!==6) {
-              e += (Math.abs(6-i)+4+j)*costC;
+              e += (Math.abs(6-i)+2+j)*costC;
             }
             break;
           case 'D':
             if(i!==8) {
-              e += (Math.abs(8-i)+4+j)*costD;
+              e += (Math.abs(8-i)+2+j)*costD;
             }
             break;
         }
